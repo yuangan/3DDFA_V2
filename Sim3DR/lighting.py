@@ -34,7 +34,7 @@ class RenderPipeline(object):
     def update_light_pos(self, light_pos):
         self.light_pos = convert_type(light_pos)
 
-    def __call__(self, vertices, triangles, bg, texture=None):
+    def __call__(self, vertices, triangles, bg, index_tri, texture=None):
         normal = get_normal(vertices, triangles)
 
         # 2. lighting
@@ -63,12 +63,12 @@ class RenderPipeline(object):
 
         # 2. rasterization, [0, 1]
         if texture is None:
-            render_img = rasterize(vertices, triangles, light, bg=bg)
-            return render_img
+            render_img, index_tri = rasterize(vertices, triangles, light, bg=bg, index_tri=index_tri)
+            return render_img, index_tri
         else:
             texture *= light
-            render_img = rasterize(vertices, triangles, texture, bg=bg)
-            return render_img
+            render_img, index_tri = rasterize(vertices, triangles, texture, bg=bg, index_tri=index_tri)
+            return render_img, index_tri
 
 
 def main():

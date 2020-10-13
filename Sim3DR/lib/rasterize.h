@@ -97,7 +97,7 @@ void _rasterize_triangles(
 
 void _rasterize(
         unsigned char *image, float *vertices, int *triangles, float *colors,
-        float *depth_buffer, int ntri, int h, int w, int c, float alpha, bool reverse);
+        float *depth_buffer, int*index_tri, int ntri, int h, int w, int c, float alpha, bool reverse);
 
 void _render_texture_core(
         float *image, float *vertices, int *triangles,

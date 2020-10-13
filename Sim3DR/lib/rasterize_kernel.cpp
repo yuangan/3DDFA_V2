@@ -217,7 +217,7 @@ void _get_normal(float *ver_normal, float *vertices, int *triangles, int nver, i
 // rasterization by Z-Buffer with optimization
 // Complexity: < ntri * h * w * c
 void _rasterize(
-        unsigned char *image, float *vertices, int *triangles, float *colors, float *depth_buffer,
+        unsigned char *image, float *vertices, int *triangles, float *colors, float *depth_buffer, int *index_tri,
         int ntri, int h, int w, int c, float alpha, bool reverse) {
     int x, y, k;
     int tri_p0_ind, tri_p1_ind, tri_p2_ind;
@@ -263,6 +263,7 @@ void _rasterize(
                 // and judge is_point_in_tri by below line of code
                 if (weight[2] >= 0 && weight[1] >= 0 && weight[0] > 0) {
                     get_point_weight(weight, p, p0, p1, p2);
+                    //cout << weight<< endl;
                     p_depth = weight[0] * p0_depth + weight[1] * p1_depth + weight[2] * p2_depth;
 
                     if ((p_depth > depth_buffer[y * w + x])) {
@@ -284,6 +285,7 @@ void _rasterize(
                         }
 
                         depth_buffer[y * w + x] = p_depth;
+                        index_tri[y * w + x] = i;
                     }
                 }
             }

@@ -17,7 +17,7 @@ cdef extern from "rasterize.h":
     )
 
     void _rasterize(
-            unsigned char*image, float*vertices, int*triangles, float*colors, float*depth_buffer,
+            unsigned char*image, float*vertices, int*triangles, float*colors, float*depth_buffer, int*index_tri,
             int ntri, int h, int w, int c, float alpha, bool reverse
     )
 
@@ -92,6 +92,7 @@ def rasterize(np.ndarray[unsigned char, ndim=3, mode = "c"] image not None,
               np.ndarray[int, ndim=2, mode="c"] triangles not None,
               np.ndarray[float, ndim=2, mode = "c"] colors not None,
               np.ndarray[float, ndim=2, mode = "c"] depth_buffer not None,
+              np.ndarray[int, ndim=2, mode="c"] index_tri not None,
               int ntri, int h, int w, int c, float alpha = 1, bool reverse = False
               ):
     _rasterize(
@@ -99,6 +100,7 @@ def rasterize(np.ndarray[unsigned char, ndim=3, mode = "c"] image not None,
         <int*> np.PyArray_DATA(triangles),
         <float*> np.PyArray_DATA(colors),
         <float*> np.PyArray_DATA(depth_buffer),
+        <int*> np.PyArray_DATA(index_tri),
         ntri, h, w, c, alpha, reverse)
 
 # def render_texture_core(np.ndarray[float, ndim=3, mode = "c"] image not None,
