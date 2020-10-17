@@ -13,6 +13,7 @@ from Sim3DR import RenderPipeline
 from utils.functions import plot_image
 from .tddfa_util import _to_ctype
 
+import math
 cfg = {
     'intensity_ambient': 0.3,
     'color_ambient': (1, 1, 1),
@@ -33,9 +34,11 @@ def render(img, ver_lst, tri, alpha=0.6, show_flag=False, wfp=None, with_bg_flag
     else:
         overlap = np.zeros_like(img)
 
+    index_tri = np.zeros_like(img[:,:,0]).astype(np.int32)
+    index_out = np.zeros_like(img)
     for ver_ in ver_lst:
         ver = _to_ctype(ver_.T)  # transpose
-        overlap = render_app(ver, tri, overlap)
+        overlap, index_tri = render_app(ver, tri, overlap, index_tri)
 
     if with_bg_flag:
         res = cv2.addWeighted(img, 1 - alpha, overlap, alpha, 0)
@@ -44,6 +47,10 @@ def render(img, ver_lst, tri, alpha=0.6, show_flag=False, wfp=None, with_bg_flag
 
     if wfp is not None:
         cv2.imwrite(wfp, res)
+        index_out[:,:,0] = index_tri%256
+        index_out[:,:,1] = np.floor(index_tri/256)%256
+        index_out[:,:,2] = np.floor((index_tri/256)/256)
+        cv2.imwrite(wfp.replace('_3d', '_index'), index_out)
         print(f'Save visualization result to {wfp}')
 
     if show_flag:
