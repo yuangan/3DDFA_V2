@@ -47,13 +47,14 @@ def render(img, ver_lst, tri, alpha=0.6, show_flag=False, wfp=None, with_bg_flag
 
     if wfp is not None:
         cv2.imwrite(wfp, res)
-        index_out[:,:,0] = index_tri%256
-        index_out[:,:,1] = np.floor(index_tri/256)%256
-        index_out[:,:,2] = np.floor((index_tri/256)/256)
-        cv2.imwrite(wfp.replace('_3d', '_index'), index_out)
+        #index_out[:,:,0] = index_tri%256
+        #index_out[:,:,1] = np.floor(index_tri/256)%256
+        #index_out[:,:,2] = np.floor((index_tri/256)/256)
+        #cv2.imwrite(wfp.replace('_3d', '_index'), index_out)
+        cv2.imwrite(wfp.replace('_3d', '_ori'), img)
         print(f'Save visualization result to {wfp}')
 
     if show_flag:
         plot_image(res)
 
-    return res
+    return index_tri
