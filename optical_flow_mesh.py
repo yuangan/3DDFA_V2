@@ -133,36 +133,32 @@ def optical_cal(tri1, tri2):
 
     flow = np.asarray([resx, resy]).transpose(1,2,0)
     print(flow.shape)
-    flow = show_flow_hsv(flow.astype(float))
+    flow = viz_flow(flow.astype(float))
     #res[x1, y1] = detax%255 + detay%255
     #res2[x2, y2] = 255
     cv2.imwrite(outpath, flow)
     #cv2.imwrite(outpath.replace('ti','ti2'), res2)
 
-def show_flow_hsv(flow, show_style=1):
-    mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1]) # 将直角坐标系光流场转成极坐标系
-
-    hsv = np.zeros((flow.shape[0], flow.shape[1], 3), np.uint8)
-
-    # 光流可视化的颜色模式
-    if show_style == 1:
-        hsv[..., 0] = ang * 180 / np.pi / 2 # angle弧度转角度
-        hsv[..., 1] = 255
-        hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX) # magnitude归到0～255之间
-    elif show_type == 2:
-        hsv[..., 0] = ang * 180 / np.pi / 2
-        hsv[..., 1] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
-        hsv[..., 2] = 255
-
-    #hsv转bgr
-    bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+def viz_flow(flow):
+    # 色调H：用角度度量，取值范围为0°～360°，从红色开始按逆时针方向计算，红色为0°，绿色为120°,蓝色为240°
+    # 饱和度S：取值范围为0.0～1.0
+    # 亮度V：取值范围为0.0(黑色)～1.0(白色)
+    h, w = flow.shape[:2]
+    hsv = np.zeros((h, w, 3), np.uint8)
+    mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+    hsv[...,0] = ang*180/np.pi/2
+    hsv[...,1] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
+    # flownet是将V赋值为255, 此函数遵循flownet，饱和度S代表像素位移的大小，亮度都为最大，便于观看
+    # 也有的光流可视化讲s赋值为255，亮度代表像素位移的大小，整个图片会很暗，很少这样用
+    hsv[...,2] = 255
+    bgr = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
     return bgr
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='The demo of still image of 3DDFA_V2')
     parser.add_argument('-c', '--config', type=str, default='configs/mb1_120x120.yml')
-    parser.add_argument('-i', '--img_fp', type=str, default='/home/wei/exp/data-IJB-C-7/GT/27751/1158591/im2.png')
-    parser.add_argument('-r', '--img_ref', type=str, default='/home/wei/exp/data-IJB-C-7/GT/27751/1158591/im4.png')
+    parser.add_argument('-i', '--img_fp', type=str, default='/home/wei/exp/data-IJB-C-7/GT/27499/1128061/im1.png')
+    parser.add_argument('-r', '--img_ref', type=str, default='/home/wei/exp/data-IJB-C-7/GT/27499/1128061/im5.png')
     parser.add_argument('-m', '--mode', type=str, default='cpu', help='gpu or cpu mode')
     parser.add_argument('-o', '--opt', type=str, default='3d',
                         choices=['2d_sparse', '2d_dense', '3d', 'depth', 'pncc', 'uv_tex', 'pose', 'ply', 'obj'])
