@@ -19,7 +19,9 @@ from utils.serialization import ser_to_obj, ser_to_ply
 from utils.tddfa_util import str2bool
 from utils.uv import uv_tex
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+import torch
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 cfg = yaml.load(open('configs/mb1_120x120.yml'), Loader=yaml.SafeLoader)
 # Init FaceBoxes and TDDFA, recommend using onnx flag
@@ -65,6 +67,7 @@ def main(args):
     ver_lst = tddfa.recon_vers(param_lst, roi_box_lst, dense_flag=dense_flag)
     # print(len(ver_lst),ver_lst[0].shape)
     if args.opt == '3d':
+        viz_pose(img, param_lst, ver_lst, show_flag=args.show_flag, wfp=wfp)
         return render(img, ver_lst, tddfa.tri, alpha=0.6, show_flag=args.show_flag, wfp=wfp)
     else:
         raise ValueError(f'Unknown opt {args.opt}')
@@ -77,7 +80,7 @@ def method_searchsort(from_values, arr, to_values1, to_values2):
     return outx, outy
 
 # searchsorted + in1d(mask)
-def method_search2(from_values, arr, to_values1, to_values2):
+def method_search2(from_values, arr, to_values1, to_values2, h, w):
     datax = np.zeros_like(arr)
     datay = np.zeros_like(arr)
     mask = np.in1d(arr, from_values)
@@ -85,7 +88,7 @@ def method_search2(from_values, arr, to_values1, to_values2):
     datax[mask] = to_values1[idx]   # Replace elements
     datay[mask] = to_values2[idx]   # Replace elements
 
-    return datax.reshape(448,448), datay.reshape(448,448)
+    return datax.reshape(h,w), datay.reshape(h,w)
 
 def method_list_comprehension(from_values, arr, to_values1, to_values2):
     d1 = dict(zip(from_values, to_values1))
@@ -136,10 +139,10 @@ def optical_cal(tri1, tri2):
     # cv2.imwrite(outpath, color)
 
     #ref
-    resx2, resy2 = method_search2(val, tri2_view, detax, detay)
+    resx2, resy2 = method_search2(val, tri2_view, detax, detay, h, w)
     flow2 = np.asarray([resy2, resx2]).transpose(1,2,0)
     color2 = viz_flow(flow2.astype(float))
-    # cv2.imwrite(outpath2, color2)
+    cv2.imwrite(outpath2, color2)
 
     return flow2
     #return flow
@@ -174,8 +177,8 @@ def wrap(img_path, flow):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='The demo of still image of 3DDFA_V2')
     parser.add_argument('-c', '--config', type=str, default='configs/mb1_120x120.yml')
-    parser.add_argument('-i', '--img_fp', type=str, default='/home/wei/exp/data-IJB-C-7/GT/27499/1128061/im1.png')
-    parser.add_argument('-r', '--img_ref', type=str, default='/home/wei/exp/data-IJB-C-7/GT/27499/1128061/im5.png')
+    parser.add_argument('-i', '--img_fp', type=str, default='/home/wei/gy/code/3DDFA_V2/examples/results/72.png_448_ori.jpg')
+    parser.add_argument('-r', '--img_ref', type=str, default='/home/wei/gy/code/3DDFA_V2/examples/results/268.png_448_ori.jpg')
     parser.add_argument('-m', '--mode', type=str, default='cpu', help='gpu or cpu mode')
     parser.add_argument('-o', '--opt', type=str, default='3d',
                         choices=['2d_sparse', '2d_dense', '3d', 'depth', 'pncc', 'uv_tex', 'pose', 'ply', 'obj'])
@@ -188,4 +191,6 @@ if __name__ == '__main__':
     img_ref_tri = main(args)
     flow = optical_cal(img_tri, img_ref_tri)
 
-    #wrap(args.img_ref, flow)
+    with open ('./examples/results/flow.npy', 'wb') as f: 
+        np.save(f, flow)
+    wrap(args.img_ref, flow)
