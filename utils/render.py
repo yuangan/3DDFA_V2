@@ -36,25 +36,28 @@ def render(img, ver_lst, tri, alpha=0.6, show_flag=False, wfp=None, with_bg_flag
 
     index_tri = np.zeros_like(img[:,:,0]).astype(np.int32)
     index_out = np.zeros_like(img)
+    if len(ver_lst) > 1:
+        print('There are two faces, which will cause fault...')
+        assert(0)
     for ver_ in ver_lst:
         ver = _to_ctype(ver_.T)  # transpose
-        overlap, index_tri = render_app(ver, tri, overlap, index_tri)
+        index_tri = render_app(ver, tri, overlap, index_tri)
 
-    if with_bg_flag:
-        res = cv2.addWeighted(img, 1 - alpha, overlap, alpha, 0)
-    else:
-        res = overlap
+    # if with_bg_flag:
+    #     res = cv2.addWeighted(img, 1 - alpha, overlap, alpha, 0)
+    # else:
+    #     res = overlap
 
-    if wfp is not None:
-        cv2.imwrite(wfp, res)
-        #index_out[:,:,0] = index_tri%256
-        #index_out[:,:,1] = np.floor(index_tri/256)%256
-        #index_out[:,:,2] = np.floor((index_tri/256)/256)
-        #cv2.imwrite(wfp.replace('_3d', '_index'), index_out)
-        cv2.imwrite(wfp.replace('_3d', '_ori'), img)
-        print(f'Save visualization result to {wfp}')
+    # if wfp is not None:
+    #     cv2.imwrite(wfp, res)
+    #     #index_out[:,:,0] = index_tri%256
+    #     #index_out[:,:,1] = np.floor(index_tri/256)%256
+    #     #index_out[:,:,2] = np.floor((index_tri/256)/256)
+    #     #cv2.imwrite(wfp.replace('_3d', '_index'), index_out)
+    #     cv2.imwrite(wfp.replace('_3d', '_ori'), img)
+    #     print(f'Save visualization result to {wfp}')
 
-    if show_flag:
-        plot_image(res)
+    # if show_flag:
+    #     plot_image(res)
 
     return index_tri

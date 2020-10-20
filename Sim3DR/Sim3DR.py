@@ -143,4 +143,4 @@ def rasterize(vertices, triangles, colors, bg=None, index_tri=None,
     #bg, buffer, index_tri = rasterize_numpy(bg, vertices, triangles, colors, buffer, triangles.shape[0], height, width, channel, index_tri, 
     #                        reverse=reverse)
 
-    return bg, index_tri
+    return index_tri

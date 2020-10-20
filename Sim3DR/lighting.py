@@ -63,12 +63,12 @@ class RenderPipeline(object):
 
         # 2. rasterization, [0, 1]
         if texture is None:
-            render_img, index_tri = rasterize(vertices, triangles, light, bg=bg, index_tri=index_tri)
-            return render_img, index_tri
+            index_tri = rasterize(vertices, triangles, light, bg=bg, index_tri=index_tri)
+            return index_tri
         else:
             texture *= light
-            render_img, index_tri = rasterize(vertices, triangles, texture, bg=bg, index_tri=index_tri)
-            return render_img, index_tri
+            index_tri = rasterize(vertices, triangles, texture, bg=bg, index_tri=index_tri)
+            return index_tri
 
 
 def main():

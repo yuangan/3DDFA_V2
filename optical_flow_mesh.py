@@ -76,7 +76,6 @@ def method_searchsort(from_values, arr, to_values1, to_values2):
     outy = to_values2[sort_idx][idx]
     return outx, outy
 
-
 # searchsorted + in1d(mask)
 def method_search2(from_values, arr, to_values1, to_values2):
     datax = np.zeros_like(arr)
@@ -129,26 +128,21 @@ def optical_cal(tri1, tri2):
 
     #resx, resy = method_searchsort(val, tri1, detax, detay)
     #resx, resy = method_list_comprehension(val, tri1, detax, detay)
-    resx, resy = method_search2(val, tri1_view, detax, detay)
-
-
-    flow = np.asarray([resy, resx]).transpose(1,2,0)
-    # print(flow.shape)
-    color = viz_flow(flow.astype(float))
-    cv2.imwrite(outpath, color)
-    #cv2.imwrite(outpath.replace('ti','ti2'), res2)
+    
+    # other
+    # resx, resy = method_search2(val, tri1_view, detax, detay)
+    # flow = np.asarray([resy, resx]).transpose(1,2,0)
+    # color = viz_flow(flow.astype(float))
+    # cv2.imwrite(outpath, color)
 
     #ref
     resx2, resy2 = method_search2(val, tri2_view, detax, detay)
-    #a = np.zeros_like(resx2)
-    #a -= 10
     flow2 = np.asarray([resy2, resx2]).transpose(1,2,0)
     color2 = viz_flow(flow2.astype(float))
-    cv2.imwrite(outpath2, color2)
+    # cv2.imwrite(outpath2, color2)
 
     return flow2
     #return flow
-
 
 def viz_flow(flow):
     # 色调H：用角度度量，取值范围为0°～360°，从红色开始按逆时针方向计算，红色为0°，绿色为120°,蓝色为240°
@@ -177,7 +171,6 @@ def wrap(img_path, flow):
                     print(i + flow[i, j, 0], j + flow[i, j, 1], flow[i,j])
     cv2.imwrite('examples/results/_wrap.jpg', output)
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='The demo of still image of 3DDFA_V2')
     parser.add_argument('-c', '--config', type=str, default='configs/mb1_120x120.yml')
@@ -195,4 +188,4 @@ if __name__ == '__main__':
     img_ref_tri = main(args)
     flow = optical_cal(img_tri, img_ref_tri)
 
-    wrap(args.img_ref, flow)
+    #wrap(args.img_ref, flow)

@@ -267,23 +267,6 @@ void _rasterize(
                     p_depth = weight[0] * p0_depth + weight[1] * p1_depth + weight[2] * p2_depth;
 
                     if ((p_depth > depth_buffer[y * w + x])) {
-                        for (k = 0; k < c; k++) {
-                            p0_color = colors[c * tri_p0_ind + k];
-                            p1_color = colors[c * tri_p1_ind + k];
-                            p2_color = colors[c * tri_p2_ind + k];
-
-                            p_color = weight[0] * p0_color + weight[1] * p1_color + weight[2] * p2_color;
-                            if (reverse) {
-                                image[(h - 1 - y) * w * c + x * c + k] = (unsigned char) (
-                                        (1 - alpha) * image[(h - 1 - y) * w * c + x * c + k] + alpha * 255 * p_color);
-//                                image[(h - 1 - y) * w * c + x * c + k] = (unsigned char) (255 * p_color);
-                            } else {
-                                image[y * w * c + x * c + k] = (unsigned char) (
-                                        (1 - alpha) * image[y * w * c + x * c + k] + alpha * 255 * p_color);
-//                                image[y * w * c + x * c + k] = (unsigned char) (255 * p_color);
-                            }
-                        }
-
                         depth_buffer[y * w + x] = p_depth;
                         index_tri[y * w + x] = i;
                     }
